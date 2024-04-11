@@ -1,5 +1,7 @@
 # QGIS Server
 
+## Overview
+
 This is a small demo repo. It utilizes several practices:
 
 - build QGIS-Server directly from source (resulting image size is around 1gb)
@@ -8,10 +10,22 @@ This is a small demo repo. It utilizes several practices:
 - Gateway route trafic to QGIS-Server, project is determined by subdomain (http://test.localhost:8081/wfs3 uses `test/test.qgs` and `test/pg_service.conf`)
 - project file is sent as `fcgi param` instead of `url param` `map` (avoid ugly url rewriting)
 - wfs3 is working fully with multiple projects
-- a listing of avalable projects can be shown http://localhost:8081/projects
+- a listing of avalable projects can be shown http://localhost:8081/projects/
+- Webserver answers correctly 404 if project file does not exist (traffic does not go all the way to QGIS-Server)
 - use [tini](https://github.com/krallin/tini) to transparently send signals (stopping/killing docker containers is working - aka no wait time until force) and correct handling of maybe existing zombie processes (cleaning in long running deployments)
 
 All this is a demonstrator setup. It showcases the possibilities to produce minuscule images and resource saving scalable variable setup.
+
+## HowTo
+
+```
+docker-compose build
+docker compose up -d
+```
+
+- [Projects list page](http://localhost:8081/projects/)
+- [Test project OGC (WMS/WFS/etc.)](http://test.localhost:8081/ogc) or [Test project OGC (WMS/WFS/etc.)](http://test.localhost:8081)
+- [Test project WFS3](http://test.localhost:8081/wfs3)
 
 ## Stats
 
