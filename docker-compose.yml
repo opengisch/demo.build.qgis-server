@@ -1,0 +1,36 @@
+version: "3.8"
+services:
+  ogc-server:
+    environment:
+      QGIS_SERVER_PARALLEL_RENDERING: "true"
+      # QGIS_SERVER_LOG_LEVEL: "0"
+    deploy:
+      replicas: 2
+    build:
+      context: ./build/ogc/
+      dockerfile: Dockerfile
+      args:
+        QGIS_TAG: final-3_34_5
+    image: qgis-server-showcase:3.34.5
+    volumes:
+      - ./data/projects/:/data:ro
+  database:
+    image: postgis/postgis:15-3.4
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data/projects/test/data/base.ch.kantons_grenzen.sql:/docker-entrypoint-initdb.d/base.ch.kantons_grenzen.sql:ro
+  gateway:
+    build:
+      context: ./build/gateway/
+      dockerfile: Dockerfile
+    image: nginx-gateway:latest
+    ports:
+      - 8081:80
+    volumes:
+      - ./data/projects:/var/www/data/projects
+      - ./deploy-config/gateway/nginx.conf:/etc/nginx/nginx.conf
+      - ./deploy-config/gateway/listing.xslt:/var/www/data/listing.xslt:ro
+      - ./deploy-config/gateway/xslt_filter_enabled.conf:/usr/share/nginx/modules/xslt_filter_enabled.conf
