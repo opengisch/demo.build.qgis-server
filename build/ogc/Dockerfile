@@ -124,7 +124,6 @@ RUN git clone https://github.com/qgis/QGIS.git && \
 
 RUN cd QGIS/build && \
     cmake -G Ninja \
-        -D CMAKE_INSTALL_PREFIX=/build/dist \
         -D WITH_ANALYSIS=FALSE \
         -D WITH_DESKTOP=FALSE \
         -D WITH_GRASS7=FALSE \
@@ -137,7 +136,7 @@ RUN cd QGIS/build && \
         -D WITH_3D=FALSE \
         .. && \
     ninja && \
-    ninja install
+    DESTDIR=/build/dist ninja install
 
 # -----------------------------------------------------------------------------
 
@@ -160,10 +159,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* /tmp/* && \
     mkdir /opt/qgis
 
-COPY --from=builder /build/dist/bin /opt/qgis/bin/
-COPY --from=builder /build/dist/include /opt/qgis/include/
-COPY --from=builder /build/dist/lib /opt/qgis/lib/
-COPY --from=builder /build/dist/share /opt/qgis/share/
+COPY --from=builder /build/dist/ /
 
 COPY uid_entrypoint.sh /usr/local/bin/
 COPY run.sh /usr/local/bin/
